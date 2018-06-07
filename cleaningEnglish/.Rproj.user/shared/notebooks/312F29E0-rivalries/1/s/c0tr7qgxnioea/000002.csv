@@ -1,0 +1,10 @@
+"0","#change this to new file name before running"
+"0","filename <- ""englishnessmarch18v2.xls"""
+"0","#activate rio library"
+"0","library(rio)"
+"2","package ‘rio’ was built under R version 3.4.4"
+"2","The following rio suggested packages are not installed: ‘clipr’, ‘csvy’, ‘feather’, ‘fst’, ‘readODS’, ‘rmatio’
+Use 'install_formats()' to install them
+"
+"0","#import the third sheet of that filename"
+"0","rivalriesresults <- import(filename,sheet=4)"

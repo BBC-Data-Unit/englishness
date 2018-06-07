@@ -1,0 +1,4 @@
+"0","rivalries.4cols <- rivalries.raw[1,3,5,7]
+"
+"2","Error in `[.data.frame`(rivalries.raw, 1, 3, 5, 7) : unused argument (7)
+"

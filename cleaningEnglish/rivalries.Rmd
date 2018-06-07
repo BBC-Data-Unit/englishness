@@ -1,0 +1,170 @@
+---
+title: "YouGov Englishness survey: rivalries"
+output: html_document
+---
+
+# YouGov Englishness survey: rivalries
+
+The Englishness survey includes responses about rivalries, but these answers contain a number of problems, particularly:
+
+* Misspellings of the same place name
+* Multiple names in one response
+
+We've created a lookup table using Open Refine and identified the top 50 places named.
+
+Now to grab the data from the YouGov XLS:
+
+```{r, eval=FALSE, include=FALSE}
+#This code chunk is set not to run because it's already been installed. However, if you get an error regarding rio below, you may want to install it by running the code here.
+#Install rio to make importing easier
+install.packages("rio")
+```
+
+Grab sheet 4 with the rivalries data:
+
+```{r}
+#change this to new file name before running
+filename <- "englishnessmarch18v2.xls"
+#activate rio library
+library(rio)
+#import the third sheet of that filename
+rivalriesresults <- import(filename,sheet=4)
+```
+
+Grab the lookup table:
+
+```{r}
+top50lookup <- import("top50lookup.csv")
+```
+
+
+## Stripping back our rivalry data
+
+It will help if we get rid of all commas, trailing and leading whitespace etc. - but the originals also have those. Just in case...
+
+```{r, eval=FALSE, include=FALSE}
+#Substitute commas for a space
+#rivalriesresults$rival <- gsub(","," ",rivalriesresults$`Please type in the place or places you’d consider to be a “rival”`)
+#Substitute double spaces
+rivalriesresults$rival <- gsub("  "," ",rivalriesresults$`Please type in the place or places you’d consider to be a “rival”`)
+#Substitute semi colons
+#rivalriesresults$rival <- gsub(";"," ",rivalriesresults$`Please type in the place or places you’d consider to be a “rival”`)
+#Trim leading and trailing white space
+rivalriesresults$rival <- trimws(rivalriesresults$rival)
+```
+
+## Merging (VLOOKUP)
+
+```{r}
+#Make sure both data frames have a column with the same name
+colnames(top50lookup)[1] <- "rival"
+rivalriesresults$rival <- rivalriesresults$`Please type in the place or places you’d consider to be a “rival”`
+#Create merged version. all.x = TRUE makes it a LEFT JOIN, i.e. no data from x is lost when there's no match
+rivalries.withlookup <- merge(x = rivalriesresults, y = top50lookup, all.x = TRUE)
+```
+
+## Pivot table
+
+We can create a basic pivot like so:
+
+```{r}
+rivalriespivot <- data.frame(table(rivalries.withlookup$`Clean version`))
+```
+
+But many entries will include names and not be limited to those. We need to find a way to check whether each entry *contains* a name.
+
+## Create columns for most popular locations
+
+One approach to doing this would be with two functions: `grepl` and [`xor`](http://stat.ethz.ch/R-manual/R-devel/library/base/html/assign.html). 
+
+* `grepl` will check whether each cell contains a value and return TRUE or FALSE. 
+* `xor` is R's version of Excel's `OR` function: it will check whether one *or* the other of two values is TRUE. We need this because we're going to have more than one set of T/F results for each check against a name (there's more than one spelling of 'Manchester' being used)
+
+Below we test some approaches:
+
+```{r}
+#First we create a test vector of possible names to match on
+manc <- c("Manchester","Manchestet")
+#pmatch - partial match - can work but it only matches at the start of the string
+rivalries.withlookup$lancs <- pmatch(rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, lancs, 0, duplicates.ok = T)
+#A loop with grepl could check for each - but the second loop overwrites the results of the first loop - so we need some way to avoid this
+for (i in manc){
+  rivalries.withlookup$manchester <- grepl(i, rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T)
+}
+
+#The solution is to use xor to compare each new vector of results with an ongoing one
+#First we create a vector containing entirely false results
+truefalse <- grepl("FALSE", rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T)
+#Then loop through the vector of misspellings
+for (i in 1:length(manc)){
+  print(i)
+  #Now we change truefalse to contain the results of comparing truefalse with the new vector of T/F matches against the misspelling. Some FALSE values will change to TRUE if they are TRUE in the comparison vector
+  #This repeats for each, but truefalse keeps a record
+  truefalse <- xor(truefalse,grepl(manc[i], rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T))
+  
+}
+#Finally store the results in a column
+rivalries.withlookup$manchester <- truefalse
+#write.csv(rivalries.withlookup,"rivalriesCHECK.csv")
+```
+## Extract vectors for popular locations
+
+To check if this works with multiple variations we need to create vectors for each of the most popular locations.
+
+```{r}
+cleancities <- tapply(top50lookup$`Grand Total`, top50lookup$`Clean version`, sum)
+cleancities <- cleancities[order(-cleancities)]
+head(cleancities, 30)
+cleancities[1]
+lancs <- subset(top50lookup, top50lookup$`Clean version` == "Lancashire")
+lancs <- lancs$`Unclean or clean to lookup`
+```
+
+And to test:
+
+```{r}
+rivalries.withlookup$manc <- grepl("manc", rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T)
+```
+
+That's one term but how about multiple ones?
+
+First, I tried looping through a vector of different variations of a name, using them with `grepl` to test if they exist, and then using `xor` to compare the results against an ongoing record (which starts with all FALSE). However, this didn't work properly.
+
+```{r}
+truefalse <- grepl("FALSE", rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T)
+for (i in 1:length(lancs)){
+  print(i)
+  #Now we change truefalse to contain the results of comparing truefalse with the new vector of T/F matches against the misspelling. Some FALSE values will change to TRUE if they are TRUE in the comparison vector
+  #This repeats for each, but truefalse keeps a record
+  truefalse <- xor(truefalse,grepl(lancs[i], rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T))
+  
+}
+#Finally store the results in a column
+rivalries.withlookup$lancs <- truefalse
+```
+
+A much simpler approach was to just create one `grepl` test which used an 'or' operator `|` with all the variations separated by it. This is achieved by using the `paste` function to combine the vector of variations, and [the `collapse` operator](https://www.r-bloggers.com/collapse-pasting-in-r/) set to insert the `|` character between each one:
+
+```{r}
+rivalries.withlookup$lanc <- grepl(paste(lancs,collapse="|"), rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T)
+```
+
+
+## Birmingham
+
+Now to create a vector for Birmingham and repeat:
+
+```{r}
+brum <- subset(top50lookup, top50lookup$`Clean version` == "Birmingham")
+brum <- brum$`Unclean or clean to lookup`
+
+rivalries.withlookup$brum <- grepl(paste(brum,collapse="|"), rivalries.withlookup$`Please type in the place or places you’d consider to be a “rival”`, ignore.case = T)
+```
+
+Now export:
+
+```{r}
+write.csv(rivalries.withlookup,"rivalrieswithlookup.csv")
+```
+
+

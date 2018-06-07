@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1525790403316.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A5D752FB",
+    "lastKnownWriteTime" : 463856467968,
+    "last_content_update" : 1525790403316,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "31A7D0B1",
+        "caption" : "rivalries.withlookup",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=rivalries.withlookup&cache_key=31A7D0B1",
+        "displayedObservations" : "22595",
+        "environment" : "",
+        "object" : "rivalries.withlookup",
+        "preview" : "0",
+        "totalObservations" : "22595",
+        "variables" : "16"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

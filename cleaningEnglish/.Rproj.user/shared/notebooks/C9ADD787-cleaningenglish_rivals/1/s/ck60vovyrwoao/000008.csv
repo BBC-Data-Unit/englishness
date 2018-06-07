@@ -1,0 +1,4 @@
+"0","write.csv(rivals, placewords.table)
+"
+"2","Error in is.data.frame(x) : object 'rivals' not found
+"

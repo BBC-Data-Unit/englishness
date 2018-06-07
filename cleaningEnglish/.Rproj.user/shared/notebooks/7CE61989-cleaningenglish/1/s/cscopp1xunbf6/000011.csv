@@ -1,0 +1,4 @@
+"0","resultscleaning <- resultsdirty[6:,]
+"
+"2","Error: unexpected ',' in ""resultscleaning <- resultsdirty[6:,""
+"

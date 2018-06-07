@@ -1,0 +1,45 @@
+---
+title: "Rivalries: the YouGov Englishness survey"
+output: html_document
+---
+
+# Finding rivalries in the YouGov Englishness survey
+
+The data comes in an Excel workbook with the main data on the fourth sheet. This needs to be placed in the same folder as this code.
+
+```{r}
+#change this to new file name before running
+filename <- "BBC_EnglishIdentity_March18_Results - Additional Crossbreaks.xls"
+#Install rio to make importing easier
+install.packages("rio")
+#activate rio library
+library(rio)
+#import the third sheet of that filename
+rivalries.raw <- import(filename,sheet=4)
+#Remove every other column (they're empty)
+rivalries.raw <- rivalries.raw[c(1,3,5,7)]
+```
+
+## Extracting the cities
+
+To extract the cities we need to treat the responses as one long string of text - this is exported as a text file and then reimported, and split.
+
+```{r}
+#We use write.csv but add a .txt extension to create a text file
+write.csv(rivalries.raw$`Please type in the place or places you’d consider to be a “rival”`, "rivalplaces.txt")
+#Now scan back in that text file
+placewords <- scan('rivalplaces.txt', what='char', sep=',')
+#And capitalise each word
+library(tools)
+placewords <- toTitleCase(placewords)
+#Test
+placewords[10]
+```
+
+```{r}
+placewords.split <- strsplit(placewords," ")
+placewords.vec <- unlist(placewords.split)
+placewords.table <- table(placewords.vec)
+write.csv(placewords.table,'rivals.csv')
+```
+

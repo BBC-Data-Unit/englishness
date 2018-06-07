@@ -1,0 +1,2 @@
+"0","#Britishness is 15-21, Englishness is 6-14"
+"0","englishbritishnessonly <- resultsplacesonly[,c(1:2,5:21)]"

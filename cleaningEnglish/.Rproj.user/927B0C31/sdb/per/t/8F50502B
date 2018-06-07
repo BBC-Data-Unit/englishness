@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1525788638901.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "8F50502B",
+    "lastKnownWriteTime" : 8319104476984115206,
+    "last_content_update" : 1525788638901,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "3A400564",
+        "caption" : "top50lookup",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=top50lookup&cache_key=3A400564",
+        "displayedObservations" : 43626,
+        "environment" : "",
+        "object" : "top50lookup",
+        "preview" : 0,
+        "totalObservations" : 43626,
+        "variables" : 9
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

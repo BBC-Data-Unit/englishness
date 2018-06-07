@@ -1,0 +1,391 @@
+---
+title: "Cleaning the YouGov Englishness survey"
+output: html_document
+---
+
+# Cleaning the YouGov Englishness survey
+
+The data comes in an Excel workbook with the main data on the third sheet. This needs to be placed in the same folder as this code.
+
+```{r, eval=FALSE, include=FALSE}
+#This code chunk is set not to run because it's already been installed. However, if you get an error regarding rio below, you may want to install it by running the code here.
+#Install rio to make importing easier
+install.packages("rio")
+```
+
+
+```{r}
+#change this to new file name before running
+filename <- "englishnessmarch18v2.xls"
+#activate rio library
+library(rio)
+#import the third sheet of that filename
+resultsdirty <- import(filename,sheet=3)
+```
+
+## Stripping out empty/unneeded rows
+
+We need to create a new data frame to contain our work in progress. We'll store the first proper row of data (row 6) to make sure it has the right number of fields. Then we'll set the column names to those in row 5.
+
+```{r}
+#Create a new data frame from all but the first 5 rows of the dirty data
+resultscleaning <- resultsdirty[-(1:5),]
+#Grab 5th row with headings and use as column names
+colnames(resultscleaning) <- resultsdirty[5,]
+
+#You could use these lines if you want to combine both header rows
+columnnamesmerged <- paste(resultsdirty[4,],resultsdirty[5,])
+#Then replace the NAs where one of the two cells being combined was empty
+columnnamesmerged <- gsub('NA','',columnnamesmerged)
+```
+
+## Transposing
+
+There are a number of ways of transposing a data frame in R. The `reshape` package's `t` function is just one.
+
+```{r, eval=FALSE, include=FALSE}
+#Install reshape package - this code block doesn't run by default as it's now been installed
+install.packages("reshape")
+```
+
+Let's use it... 
+
+```{r}
+#Add to library
+library(reshape)
+#Use t function to transpose cleaned data 
+transposeresults <- t(resultscleaning)
+transposeresults.bymatrix <- as.data.frame(t(as.matrix(resultscleaning)))
+#This doesn't have column headings yet, so we can extract those from the other's first row
+#However, many of the entries here are identical, which makes extracting columns hard
+colnames(transposeresults.bymatrix) <- transposeresults[1,]
+#And remove our now redundant first row
+transposeresults.bymatrix <- transposeresults.bymatrix[-1,]
+#This way has a similar result but missing the first column
+library(data.table)
+transposeresults.datatable <- transpose(resultscleaning)
+```
+
+## Extracting just the counties
+
+A new data frame can be created by extracting specific rows
+
+```{r}
+#The 6th column contains the answer to % who feel very strongly English
+verystrongenglish <- as.data.frame(transposeresults.bymatrix[,7])
+#Add the row names so we know what they match to
+verystrongenglish$subcategory <- rownames(transposeresults.bymatrix)
+```
+
+We can access a particular row by using its name instead of an index, like so:
+
+```{r}
+transposeresults.bymatrix["Con",]
+```
+
+And we can find out the index of a row by using `which` like so:
+
+```{r}
+which(rownames(transposeresults.bymatrix)=="No county")
+```
+
+Because we know counties begin at index 34 we can chop out the others:
+
+```{r}
+resultsplacesonly <- transposeresults.bymatrix[-(1:33),]
+```
+
+Likewise we can extract just those results related to age by first identifying the indexes...
+
+```{r}
+which(rownames(transposeresults.bymatrix)=="18-24")
+which(rownames(transposeresults.bymatrix)=="65+")
+```
+...and then extracting those:
+
+```{r}
+resultsagesonly <- transposeresults.bymatrix[(9:12),]
+```
+
+
+
+## Export as CSV
+
+
+```{r}
+write.csv(resultsplacesonly,"resultslocationsonly.csv")
+write.csv(resultsagesonly,"resultsagesonly.csv")
+```
+
+
+## Narrow down further
+
+And if we only want answers to one particular question we can do the same for columns:
+
+```{r}
+#First find out the headings and indexes
+colnames(resultsplacesonly)
+#Then only grab those we want - the Englishness/Britishness questions run up to row 21
+englishbritishnessonly <- resultsplacesonly[,c(1:2,5:21)]
+```
+
+
+
+## Cleaning column names
+
+Could we make the column names clearer? Because the question and the answers are in separate rows in the original spreadsheet - and these are now columns in the transposed versino - it's not easy to see the answer in context. The code below pulls the question into each answer in parentheses to address this.
+
+```{r}
+#Change columns 5-11 to add 4 "(English)" in parentheses
+colnames(englishbritishnessonly)[5:11] <- paste(
+  colnames(englishbritishnessonly)[5:11],
+  " (",
+  colnames(englishbritishnessonly)[4],
+  ")",sep=""
+  )
+#show the column names
+colnames(englishbritishnessonly)[13:19]
+#Change columns 5-11 to add 4 "(English)" in parentheses
+colnames(englishbritishnessonly)[13:19] <- paste(
+  colnames(englishbritishnessonly)[13:19],
+  " (",
+  colnames(englishbritishnessonly)[12],
+  ")",sep=""
+  )
+#show the column names
+colnames(englishbritishnessonly)[13:19]
+```
+
+
+Now export:
+
+```{r}
+write.csv(englishbritishnessonly,"englishbritishnessonly.csv")
+```
+
+## Creating a column name cleaning function
+
+Because that pattern recurs - grabbing the question and inserting it into 7 answers that follow it - we should store it in a function to reuse.
+
+```{r}
+#dfname is the name of the data frame to be cleaned
+#questioncolumnindex should be the index of the column containing the question to be added to answers (this should come just before them)
+cleancols <- function(dfname,questioncolumnindex){
+  #create a range which starts at a number one higher than the question index, and ends 7 higher
+  answerrange <- seq(questioncolumnindex+1,questioncolumnindex+7)
+  print(answerrange)
+  #replace the column names with the same column names, but adding the question at the index specified, between brackets
+  colnames(dfname)[answerrange] <- paste(
+  colnames(dfname)[answerrange],
+  " (",
+  colnames(dfname)[questioncolumnindex],
+  ")",sep=""
+  )
+#colnames(dfname)[answerrange]
+#send the results back to whatever called this function
+return(dfname)
+}
+```
+
+And test that:
+
+```{r}
+#Create the unclean version as before
+englishbritishnessonly.test <- resultsplacesonly[,c(1:2,5:21)]
+#Run the function with that, and an index of 4
+englishbritishnessonly.test <- cleancols(englishbritishnessonly.test,4)
+#Trying it again creates an error
+englishbritishnessonly.test <- cleancols(englishbritishnessonly.test,12)
+```
+
+The function has also been saved as an R file called cleancols7.R
+
+## Creating subsets for particular questions
+
+Each section below generates a dataset to address one of the following bullet points:
+
+* The most/least English pieces. What the data tells us about the split between regions, old and young etc.
+* Feature: Embarrassed to be English? Exploring one of the questions from the survey
+* Feature: Who rules us? Combined authorities were brought in to give super regions are bigger say in their own affairs. People are said to like them and yet they are held largely behind closed doors. Are these better than an English parliament? 
+* And has that idea now gone away?
+
+### Creating a data frame for all 'Do you identify yourself as being' questions
+
+
+The answers down to row 76 on the original xls file all relate to this question. Here we grab all those and put into one data frame, then export.
+
+```{r}
+#First find out the headings and indexes - limit to the first 100
+head(colnames(resultsplacesonly),100)
+#Then only grab those we want - the questions run up to row 69 (we leave out columns 3 and 4 because they are blank)
+identificationonly <- resultsplacesonly[,c(1:2,5:69)]
+#repeat with the ages only data frame
+identificationonly.ages <- resultsagesonly[,c(1:2,5:69)]
+```
+
+The questions we want run up to index 69 - this is 6 before the row 75 which we know is where the break appears in the spreadsheet, and we removed 6 rows, so we can use this knowledge to identify indexes in future.
+
+Now to clean the column headings using that function.
+
+```{r}
+#First create a sequence that starts with the index for the first question, and stores every 8th index, e.g. 4, 12, and so on.
+questioncols <- seq(4,length(identificationonly),8)
+#This is then used to loop through and create a clean dataset
+#First, create a new data frame to use for cleaning so we can compare
+identificationonly.clean <- identificationonly
+for (i in questioncols){
+  identificationonly.clean <- cleancols(identificationonly.clean,i)
+}
+```
+
+Now to repeat for ages
+
+```{r}
+#First create a sequence that starts with the index for the first question, and stores every 8th index, e.g. 4, 12, and so on.
+questioncols <- seq(4,length(identificationonly.ages),8)
+#This is then used to loop through and create a clean dataset
+#First, create a new data frame to use for cleaning so we can compare
+identificationonly.ages.clean <- identificationonly.ages
+for (i in questioncols){
+  identificationonly.ages.clean <- cleancols(identificationonly.ages.clean,i)
+}
+```
+
+And export:
+
+```{r}
+write.csv(identificationonly.clean, "identificationonly_areas.csv")
+write.csv(identificationonly.ages.clean, "identificationonly_ages.csv")
+```
+
+### Extracting 'How do you think of yourself?'
+
+This question appears in row 77 of the spreadsheet: 'Which of the following best describes the way you think of yourself?'
+
+
+```{r}
+#Then only grab those we want - the questions run up to row 69 (we leave out columns 3 and 4 because they are blank)
+thinkofonly <- resultsplacesonly[,c(1:2,71:80)]
+#repeat with the ages only data frame
+thinkofonly.ages <- resultsagesonly[,c(1:2,71:80)]
+```
+
+There's no need to add extra detail to column headings as this is so small.
+
+```{r}
+write.csv(thinkofonly, "thinkofonly.csv")
+write.csv(thinkofonly.ages, "thinkofonlyages.csv")
+```
+
+### Extracting 'embarrassed'
+
+This question appears in row 88 of the spreadsheet: 'Which of the following best describes the way you think of yourself?'
+
+
+```{r}
+#Then only grab those we want - the questions run up to row 69 (we leave out columns 3 and 4 because they are blank)
+embarrasedonly <- resultsplacesonly[,c(1:2,82:91)]
+#repeat with the ages only data frame
+embarrasedonly.ages <- resultsagesonly[,c(1:2,82:91)]
+```
+
+There's no need to add extra detail to column headings as this is so small.
+
+```{r}
+write.csv(embarrasedonly, "embarrasedonly.csv")
+write.csv(embarrasedonly.ages, "embarrasedonlyages.csv")
+
+```
+
+### Extracting combined authority questions
+
+
+Row 601 onwards of the spreadsheet relate to combined authorities and other authorities.
+
+
+```{r}
+#Then only grab those we want - the questions run up to row 69 (we leave out columns 3 and 4 because they are blank)
+claonly <- resultsplacesonly[,c(1:2,595:649)]
+#repeat with the ages only data frame
+claonly.ages <- resultsagesonly[,c(1:2,595:649)]
+```
+
+We need to inject questions into answers again. This time it's one for every 4, so let's adapt the previous function:
+
+```{r}
+#dfname is the name of the data frame to be cleaned
+#questioncolumnindex should be the index of the column containing the question to be added to answers (this should come just before them)
+cleancols4 <- function(dfname,questioncolumnindex){
+  #create a range which starts at a number one higher than the question index, and ends 4 higher
+  answerrange <- seq(questioncolumnindex+1,questioncolumnindex+4)
+  print(answerrange)
+  #replace the column names with the same column names, but adding the question at the index specified, between brackets
+  colnames(dfname)[answerrange] <- paste(
+  colnames(dfname)[answerrange],
+  " (",
+  colnames(dfname)[questioncolumnindex],
+  ")",sep=""
+  )
+#colnames(dfname)[answerrange]
+#send the results back to whatever called this function
+return(dfname)
+}
+```
+
+Now to clean the column headings using that function.
+
+```{r}
+#First create a sequence that starts with the index for the 13th question, and stores every 5th index, e.g. 13, 18, and so on.
+questioncols5 <- seq(13,length(claonly),5)
+#This is then used to loop through and create a clean dataset
+#First, create a new data frame to use for cleaning so we can compare
+claonly.clean <- claonly
+for (i in questioncols5){
+  claonly.clean <- cleancols4(claonly.clean,i)
+}
+```
+
+Now to repeat for ages:
+
+```{r}
+#First create a sequence that starts with the index for the 13th question, and stores every 5th index, e.g. 13, 18, and so on.
+questioncols5 <- seq(13,length(claonly),5)
+#This is then used to loop through and create a clean dataset
+#First, create a new data frame to use for cleaning so we can compare
+claonly.ages.clean <- claonly.ages
+for (i in questioncols5){
+  claonly.ages.clean <- cleancols4(claonly.ages.clean,i)
+}
+```
+
+
+And export.
+
+```{r}
+write.csv(claonly.ages.clean, "claonly_ages.csv")
+write.csv(claonly.clean, "claonly.csv")
+
+```
+
+
+
+
+### Extracting English parliament questions
+
+This question appears in row 580 of the spreadsheet: 'Would you support or oppose introducing an English Parliament, similar to the Welsh Assembly or Scottish Parliament?'
+
+
+```{r}
+#Then only grab those we want - the questions run up to row 69 (we leave out columns 3 and 4 because they are blank)
+engparliament <- resultsplacesonly[,c(1:2,574:581)]
+#repeat with the ages only data frame
+engparliament.ages <- resultsagesonly[,c(1:2,574:581)]
+```
+
+There's no need to add extra detail to column headings as this is so small.
+
+```{r}
+write.csv(engparliament, "engparliament.csv")
+write.csv(engparliament.ages, "engparliament_ages.csv")
+```
+

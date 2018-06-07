@@ -1,0 +1,5 @@
+"0","#Make sure both data frames have a column with the same name"
+"0","colnames(top50lookup)[1] <- ""rival"""
+"0","rivalriesresults$rival <- rivalriesresults$`Please type in the place or places you’d consider to be a “rival”`"
+"0","#Create merged version. all.x = TRUE makes it a LEFT JOIN, i.e. no data from x is lost when there's no match"
+"0","rivalries.withlookup <- merge(x = rivalriesresults, y = top50lookup, all.x = TRUE)"
