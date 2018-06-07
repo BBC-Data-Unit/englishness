@@ -204,10 +204,9 @@ The function has also been saved as an R file called cleancols7.R
 
 Each section below generates a dataset to address one of the following bullet points:
 
-* The most/least English pieces. What the data tells us about the split between regions, old and young etc.
-* Feature: Embarrassed to be English? Exploring one of the questions from the survey
-* Feature: Who rules us? Combined authorities were brought in to give super regions are bigger say in their own affairs. People are said to like them and yet they are held largely behind closed doors. Are these better than an English parliament? 
-* And has that idea now gone away?
+* What the data tells us about the split between regions, old and young etc.
+* Feature: Embarrassed/proud to be English
+* Feature: Combined authorities 
 
 ### Creating a data frame for all 'Do you identify yourself as being' questions
 
