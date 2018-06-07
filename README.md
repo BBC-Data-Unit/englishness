@@ -12,6 +12,10 @@ And **Dan Wainwright** created an in-story **chatbot** about devoloved powers in
 
 * [YouGov poll results](https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7lnxwjw12j/BBC_EnglishIdentity_March18_Results_for_website.pdf) (PDF)
 
+## Code and cleaning
+
+* [R Markdown files used to clean the data can be found in the cleaningEnglish folder](https://github.com/BBC-Data-Unit/englishness/tree/master/cleaningEnglish). However, we are unfortunately unable to share the YouGov data which this was used with.
+
 ## Interviews and quotes
 
 * Video asking people in different parts of the country 'Do you feel English?' and other questions
