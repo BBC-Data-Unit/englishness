@@ -32,7 +32,7 @@ Dan also took part in around a dozen two-ways (interviews with presenters) as pa
 
 For the piece [Will England ever get its own Parliament?](https://www.bbc.co.uk/news/uk-politics-44208859#responsive-iframe-cmu-bot-main):
 
-* In-story **chatbot** about devoloved powers in England.
+* In-story **chatbot** about devolved powers in England.
 
 ## About the data
 
