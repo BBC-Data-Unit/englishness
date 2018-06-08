@@ -2,11 +2,9 @@
 
 ![](https://ichef.bbci.co.uk/news/624/cpsprodpb/15178/production/_101829368_optimised-county_identity_map-nc.png)
 
-In June 2018 the data unit was part of a BBC-wide project, **The English Question**, based on a major survey of Englishess. We reported [young people are far less likely to feel proud to be English than older generations](https://www.bbc.co.uk/news/uk-england-44142843), as well as contributing to other reporting in the BBC.
+In June 2018 the data unit was part of a BBC-wide project based on a major survey of Englishess: **The English Question**. We reported [young people are far less likely to feel proud to be English than older generations](https://www.bbc.co.uk/news/uk-england-44142843), created a briefing pack about the data, which was used in part for Mark Easton's piece [The English question: What is the nation's identity?](https://www.bbc.co.uk/news/uk-44306737), and **Dan Wainwright** created an in-story **chatbot** about devoloved powers in England for the piece [Will England ever get its own Parliament?](https://www.bbc.co.uk/news/uk-politics-44208859#responsive-iframe-cmu-bot-main). 
 
-We also created a briefing pack about the data, which was used in part for Mark Easton's piece [The English question: What is the nation's identity?](https://www.bbc.co.uk/news/uk-44306737).
-
-And **Dan Wainwright** created an in-story **chatbot** about devoloved powers in England for the piece [Will England ever get its own Parliament?](https://www.bbc.co.uk/news/uk-politics-44208859#responsive-iframe-cmu-bot-main)
+Dan also took part in around a dozen two-ways (interviews with presenters) as part of BBC radio coverage during the week.
 
 ## Get the data
 
@@ -31,6 +29,10 @@ And **Dan Wainwright** created an in-story **chatbot** about devoloved powers in
 * Multiple bar chart: proud or embarrassed to identify as English, by age group
 * Multiple bar chart: qualities that respondents believe make a person English, or do not make a person English
 * Bar chart: percentage of respondents identifying characteristics as fairly or very strongly associated with Englishness
+
+For the piece [Will England ever get its own Parliament?](https://www.bbc.co.uk/news/uk-politics-44208859#responsive-iframe-cmu-bot-main):
+
+* In-story **chatbot** about devoloved powers in England.
 
 ## About the data
 
