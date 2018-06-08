@@ -10,13 +10,13 @@ Dan also took part in around a dozen two-ways (interviews with presenters) as pa
 
 * [YouGov poll results](https://d25d2506sfb94s.cloudfront.net/cumulus_uploads/document/7lnxwjw12j/BBC_EnglishIdentity_March18_Results_for_website.pdf) (PDF)
 
-## Code and cleaning
+### Code and cleaning
 
-* [R Markdown files used to clean the data can be found in the cleaningEnglish folder](https://github.com/BBC-Data-Unit/englishness/tree/master/cleaningEnglish). However, we are unfortunately unable to share the YouGov data which this was used with.
+* [R Markdown files used to prepare the data for analysis, including transposition and subsetting, and cleaning of free text responses regarding rivalries, can be found in the cleaningEnglish folder](https://github.com/BBC-Data-Unit/englishness/tree/master/cleaningEnglish). We are unfortunately unable to share the YouGov spreadsheets which this was used with.
 
 ## Interviews and quotes
 
-* Video asking people in different parts of the country 'Do you feel English?' and other questions
+* Video interviews were conducted with people in different parts of the country, asking 'Do you feel English?' and other questions
 * John Denham, director of the Centre for English Identity and Politics, University of Winchester
 
 ## Visualisation and interactivity
