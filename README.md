@@ -4,7 +4,8 @@
 
 In June 2018 the data unit was part of a BBC-wide project based on a major survey of Englishess: **The English Question**. We reported [young people are far less likely to feel proud to be English than older generations](https://www.bbc.co.uk/news/uk-england-44142843), created a briefing pack about the data, which was used in part for Mark Easton's piece [The English question: What is the nation's identity?](https://www.bbc.co.uk/news/uk-44306737), and **Dan Wainwright** created an in-story **chatbot** about devoloved powers in England for the piece [Will England ever get its own Parliament?](https://www.bbc.co.uk/news/uk-politics-44208859#responsive-iframe-cmu-bot-main). 
 
-Dan also took part in around a dozen two-ways (interviews with presenters) as part of BBC radio coverage during the week.
+Dan also took part in around a dozen two-ways (interviews with presenters) as part of BBC radio coverage during the week. In Oxford reporters asked why people there don’t feel particularly English; and Radio Cambridgeshire [looked at the Fenland area](https://www.bbc.co.uk/programmes/p067j04f) (1 hour and 13 in).
+
 
 ## Get the data
 
